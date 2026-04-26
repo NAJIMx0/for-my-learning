@@ -1,779 +1,124 @@
 # System Architectures — Complete Reference Guide
 
-> **ArchTemplat v1.0** · 32 Major World Architectures · AI-powered system architecture generator
-
----
-
-## Table of Contents
-
-1. [Monolithic Architecture](#1-monolithic-architecture)
-2. [Layered (N-Tier) Architecture](#2-layered-n-tier-architecture)
-3. [Microservices Architecture](#3-microservices-architecture)
-4. [Service-Oriented Architecture (SOA)](#4-service-oriented-architecture-soa)
-5. [Serverless Architecture (FaaS)](#5-serverless-architecture-faas)
-6. [Event-Driven Architecture (EDA)](#6-event-driven-architecture-eda)
-7. [Hexagonal Architecture (Ports & Adapters)](#7-hexagonal-architecture-ports--adapters)
-8. [Clean Architecture](#8-clean-architecture)
-9. [Domain-Driven Design (DDD)](#9-domain-driven-design-ddd)
-10. [CQRS + Event Sourcing](#10-cqrs--event-sourcing)
-11. [Pipe and Filter Architecture](#11-pipe-and-filter-architecture)
-12. [Space-Based Architecture](#12-space-based-architecture)
-13. [Broker / Message Bus Architecture](#13-broker--message-bus-architecture)
-14. [Peer-to-Peer (P2P) Architecture](#14-peer-to-peer-p2p-architecture)
-15. [Client-Server Architecture](#15-client-server-architecture)
-16. [Master-Slave Architecture](#16-master-slave-architecture)
-17. [Shared-Nothing Architecture](#17-shared-nothing-architecture)
-18. [Lambda Architecture (Big Data)](#18-lambda-architecture-big-data)
-19. [Kappa Architecture (Big Data)](#19-kappa-architecture-big-data)
-20. [Data Mesh Architecture](#20-data-mesh-architecture)
-21. [Microfrontend Architecture](#21-microfrontend-architecture)
-22. [JAMstack Architecture](#22-jamstack-architecture)
-23. [BFF — Backend for Frontend](#23-bff--backend-for-frontend)
-24. [SAGA Pattern Architecture](#24-saga-pattern-architecture)
-25. [Strangler Fig Architecture](#25-strangler-fig-architecture)
-26. [Cell-Based Architecture](#26-cell-based-architecture)
-27. [Edge Computing Architecture](#27-edge-computing-architecture)
-28. [Reactive Architecture](#28-reactive-architecture)
-29. [Actor Model Architecture](#29-actor-model-architecture)
-30. [Plugin / Extension Architecture](#30-plugin--extension-architecture)
-31. [API Gateway Architecture](#31-api-gateway-architecture)
-32. [Service Mesh Architecture](#32-service-mesh-architecture)
-- [Architecture Decision Map](#architecture-decision-map)
+ArchTemplat v1.0 · 32 Major World Architectures
 
 ---
 
 ## 1. Monolithic Architecture
-
-All application components (UI, business logic, database access) are packaged and deployed as a **single unit**.
-
-```
-+------------------------------------+
-|          MONOLITHIC APP            |
-|  +--------+  +--------+  +------+ |
-|  |   UI   |  | Logic  |  | Data | |
-|  +--------+  +--------+  +------+ |
-+------------------------------------+
-                  |
-             +----v----+
-             |   DB    |
-             +---------+
-```
-
-| Property | Value |
-|---|---|
-| Deployment | Single unit |
-| Scalability | Vertical |
-| Coupling | High |
-| Complexity | Low |
-
-**When to use:** Small teams, early-stage startups, simple applications, rapid prototyping.
-
----
+All components (UI, logic, database) are in one single deployable unit. Simple to start with but hard to scale. Best for small teams and early-stage projects.
 
 ## 2. Layered (N-Tier) Architecture
-
-Application divided into **horizontal layers**, each with a distinct responsibility. Each layer only communicates with the layer directly below it.
-
-```
-+----------------------------+
-|    PRESENTATION LAYER      |  <- UI / API
-+----------------------------+
-|    APPLICATION LAYER       |  <- Use cases
-+----------------------------+
-|     BUSINESS LAYER         |  <- Rules
-+----------------------------+
-|    PERSISTENCE LAYER       |  <- ORM
-+----------------------------+
-|     DATABASE LAYER         |  <- SQL/NoSQL
-+----------------------------+
-```
-
-| Property | Value |
-|---|---|
-| Deployment | Layered units |
-| Scalability | Limited |
-| Testability | High |
-
-**When to use:** Enterprise apps, well-defined separation of concerns.
-
----
+The app is split into layers — Presentation, Business, Persistence, and Database. Each layer talks only to the one below it. Common in enterprise applications.
 
 ## 3. Microservices Architecture
-
-Application broken into **small, independent services**, each responsible for a specific business capability. Communicate over network (HTTP/REST, gRPC, messaging).
-
-```
-       +---------+
-       | Client  |
-       +----+----+
-            |
-       +----v----+
-       | API GW  |
-       +-+---+--++
-         |   |   |
-    +----v-+ | +--v---+
-    |UserSvc| | |Order |
-    +---+---+ | +-+----+
-        |  +--v--+  |
-        |  |PaySvc|  |
-        |  +------+  |
-   +----v--+    +----v-+
-   |  DB 1 |    | DB 2 |
-   +-------+    +------+
-```
-
-| Property | Value |
-|---|---|
-| Deployment | Independent per service |
-| Scalability | High (per service) |
-| Complexity | Very High |
-| Coupling | Low |
-
-**Examples:** Netflix, Amazon, Uber
-
-**When to use:** Large teams, independent deployments, diverse technology stacks.
-
----
+The app is broken into small independent services, each doing one thing. They communicate over HTTP or messaging. Used by Netflix, Amazon, and Uber.
 
 ## 4. Service-Oriented Architecture (SOA)
-
-Similar to microservices but services are **coarser-grained** and communicate through an Enterprise Service Bus (ESB). Services are reusable business units shared across the enterprise.
-
-```
-+--------+    +--------+    +--------+
-|ServiceA|    |ServiceB|    |ServiceC|
-+----+---+    +----+---+    +---+----+
-     +-----------v-----------+
-          +----v-------+
-          |     ESB     |
-          +-----+-------+
-     +-----------^-----------+
-+---v---+  +----v---+  +---v---+
-|Consumer|  |Consumer|  |Consumer|
-+--------+  +--------+  +--------+
-```
-
-**When to use:** Enterprise integration, legacy system coordination, cross-team service reuse.
-
----
+Similar to microservices but services are bigger and communicate through a central Enterprise Service Bus (ESB). Common in large enterprise environments.
 
 ## 5. Serverless Architecture (FaaS)
-
-Business logic runs in **stateless functions** triggered by events. Infrastructure management is fully abstracted — pay-per-invocation.
-
-```
-  +------+   +------+   +------+
-  | HTTP |   |Queue |   |Timer |
-  |Trig. |   |Trig. |   |Trig. |
-  +--+---+   +--+---+   +--+---+
-     |           |          |
-  +--v---+   +---v---+  +---v---+
-  |Lambda |  | Lambda | | Lambda |
-  | FuncA |  | FuncB  | | FuncC  |
-  +-------+  +--------+ +--------+
-     |           |          |
-  +--v-----------v----------v--+
-  |       Cloud Services       |
-  |    (S3, DynamoDB, etc.)   |
-  +----------------------------+
-```
-
-| Property | Value |
-|---|---|
-| Cost model | Pay-per-invocation |
-| Scalability | Auto / infinite |
-| Vendor lock-in | High |
-
-**When to use:** Variable workloads, event-driven tasks, teams with no ops capacity.
-
----
+You write functions, the cloud runs them when triggered. No server management. You pay only when your code runs. Good for event-driven or unpredictable workloads.
 
 ## 6. Event-Driven Architecture (EDA)
-
-Components communicate by **producing and consuming events asynchronously**. The producer doesn't know who consumes the events.
-
-```
- +---------+      +-------------------+
- |Producer |----->|   Event Broker    |
- |(OrderSvc)|     |(Kafka/RabbitMQ)   |
- +---------+      +--------+----------+
-                           |
-          +----------------+----------------+
-          |                |                |
-     +----v---+      +----v--+      +---v------+
-     |Shipping|      |Invoice|      |Analytics |
-     +--------+      +-------+      +----------+
-```
-
-**Sub-patterns:**
-- **Event Notification** — signals something happened
-- **Event-Carried State Transfer** — event contains full state
-- **Event Sourcing** — events ARE the source of truth
-
-**When to use:** Decoupled systems, real-time processing, audit trails.
-
----
+Services communicate by sending and listening to events through a broker like Kafka or RabbitMQ. Services are fully decoupled from each other.
 
 ## 7. Hexagonal Architecture (Ports & Adapters)
-
-Keeps core application logic **independent from external systems** (UI, DB, APIs). Communication happens through defined ports and adapters.
-
-```
-+--------------------------------------+
-|           ADAPTERS (outside)         |
-| +------+  +------------------------+ |
-| | REST |->|      PORT (interface)  | |
-| |  UI  |  |                        | |
-| +------+  |    CORE APPLICATION    | |
-| |  CLI |->|  (pure business logic) | |
-| +------+  |      PORT (interface)  | |
-|           +------------------------+ |
-|           ADAPTERS (outside)         |
-+--------------------------------------+
-```
-
-**When to use:** Domain-focused apps, heavy testing requirements, swappable infrastructure.
-
----
+The core business logic sits in the middle, completely isolated. Everything external (UI, DB, APIs) connects through defined ports. Very testable and flexible.
 
 ## 8. Clean Architecture
-
-By **Robert C. Martin (Uncle Bob)**. Code organized in concentric circles — inner circles know nothing about outer circles. Dependency always points inward.
-
-```
-+----------------------------------------+
-|       FRAMEWORKS & DRIVERS (outer)     |
-|   +--------------------------------+   |
-|   |     INTERFACE ADAPTERS         |   |
-|   |   +------------------------+   |   |
-|   |   |        USE CASES       |   |   |
-|   |   |   +----------------+   |   |   |
-|   |   |   |    ENTITIES    |   |   |   |
-|   |   |   +----------------+   |   |   |
-|   |   +------------------------+   |   |
-|   +--------------------------------+   |
-+----------------------------------------+
-```
-
-**When to use:** Long-lived software, domain-heavy systems, high testability requirements.
-
----
+By Robert C. Martin. Code is organized in circles — the inner circles (entities, use cases) know nothing about the outer ones (frameworks, UI). Dependencies always point inward.
 
 ## 9. Domain-Driven Design (DDD)
-
-By **Eric Evans**. Design centered around the domain model — a shared language between developers and domain experts.
-
-```
-+---------------------------------------------+
-|               DOMAIN MODEL                  |
-|                                             |
-|  +----------------+  +-------------------+  |
-|  |Bounded Context |  | Bounded Context   |  |
-|  |   Ordering     |->|    Shipping       |  |
-|  |                |  |                   |  |
-|  | +----------+   |  | +-------------+  |  |
-|  | |Aggregate |   |  | |  Aggregate  |  |  |
-|  | | (Order)  |   |  | | (Shipment)  |  |  |
-|  | +----------+   |  | +-------------+  |  |
-|  +----------------+  +-------------------+  |
-+---------------------------------------------+
-```
-
-**Building Blocks:**
-- **Entity** — has identity (Order, User)
-- **Value Object** — no identity (Money, Address)
-- **Aggregate** — cluster of entities with one root
-
-**When to use:** Complex business domains, large codebases, microservices with bounded contexts.
-
----
+By Eric Evans. The design is built around the business domain with a shared language between developers and business people. Uses concepts like Bounded Contexts and Aggregates.
 
 ## 10. CQRS + Event Sourcing
-
-**CQRS:** Separate models for reading and writing.
-**Event Sourcing:** Instead of storing current state, store a sequence of events.
-
-```
-           WRITE SIDE          READ SIDE
-
-  User --> Command --> Handler --> Event Store
-                                       |
-                                  +----v------+
-                                  | Projection|
-                                  | Read Model|
-                                  +-----+-----+
-                                        |
-                                  User <-+
-```
-
-**When to use:** Finance, audit systems, collaborative apps, systems requiring history replay.
-
----
+CQRS splits reading and writing into separate models. Event Sourcing stores every change as an event instead of just saving the current state. Great for audit and history.
 
 ## 11. Pipe and Filter Architecture
-
-Data flows through **processing steps (filters)** connected by channels (pipes). Each filter transforms data independently.
-
-```
-Input --> [Filter A] --> [Filter B] --> [Filter C] --> Output
-          (Validate)    (Transform)      (Enrich)
-```
-
-**When to use:** ETL pipelines, compilers, data transformation, Unix shell pipes, Apache Camel.
-
----
+Data passes through a series of processing steps (filters) connected by pipes. Each filter transforms the data. Used in ETL pipelines, compilers, and Unix commands.
 
 ## 12. Space-Based Architecture
-
-Designed for **extreme scalability**. Removes the database as a bottleneck using an in-memory distributed data grid.
-
-```
-+----------------------------------+
-|        PROCESSING UNITS          |
-| +---------+   +---------+        |
-| | PU 1    |   | PU 2    |  ...   |
-| |(app +   |   |(app +   |        |
-| | cache)  |   | cache)  |        |
-| +---------+   +---------+        |
-+-----------+----------------------+
-            |
-+-----------v-----------+
-| Virtualized Middleware |
-|(Messaging, Data Grid) |
-+------------------------+
-```
-
-**When to use:** High-traffic apps, trading platforms, gaming backends.
-
----
+Removes the database as a bottleneck by using an in-memory distributed data grid. Built for extreme scalability. Used in high-traffic and real-time systems.
 
 ## 13. Broker / Message Bus Architecture
-
-Central broker **routes messages** between components. Components only know the broker, not each other.
-
-```
-+--------+    +-----------------+    +--------+
-|Service |--->|  Message Broker |--> |Service |
-|   A    |    |(RabbitMQ/Kafka) |    |   B    |
-+--------+    +--------+--------+    +--------+
-                       |
-                  +----v----+
-                  |Service C|
-                  +---------+
-```
-
-**When to use:** Decoupled services, asynchronous workflows, event fan-out.
-
----
+A central broker (like RabbitMQ or Kafka) routes messages between services. Services only talk to the broker, never directly to each other.
 
 ## 14. Peer-to-Peer (P2P) Architecture
-
-No central server — every node is **both client and server**. Nodes share resources directly.
-
-```
-    +-----+        +-----+
-    |Node |<------>|Node |
-    +--+--+        +--+--+
-       |   +-----+    |
-       +-->|Node |<---+
-           +-----+
-```
-
-**Examples:** File sharing (BitTorrent), blockchain (Bitcoin, Ethereum)
-
-**When to use:** Decentralized systems, blockchain networks, file sharing.
-
----
+No central server. Every node acts as both a client and a server. Used in file sharing (BitTorrent) and blockchain networks (Bitcoin, Ethereum).
 
 ## 15. Client-Server Architecture
-
-Clients request services, servers provide them. The **most fundamental** distributed architecture pattern.
-
-```
- +--------+   request   +--------+
- | Client |------------>| Server |
- |        |<------------|        |
- +--------+   response  +--------+
-```
-
-**Variants:**
-- **2-Tier:** Client ↔ Server
-- **3-Tier:** Client ↔ App Server ↔ DB Server
-- **N-Tier:** Multiple intermediary layers
-
----
+The most basic pattern. Clients send requests, servers respond. Can be 2-tier, 3-tier, or N-tier depending on how many layers are in between.
 
 ## 16. Master-Slave Architecture
-
-Master node **delegates work** to slave nodes and aggregates results. Used for replication and parallel computation.
-
-```
-           +--------+
-           | Master |
-           +----+---+
-    +-------+   |   +-------+
- +--v--+    +--v--+    +--v--+
- |Slave|    |Slave|    |Slave|
- |  1  |    |  2  |    |  3  |
- +-----+    +-----+    +-----+
-```
-
-**Examples:** MySQL primary-replica, Redis replication, Hadoop MapReduce
-
----
+A master node distributes work to slave nodes and collects the results. Used for database replication and parallel processing. Examples: MySQL, Redis, Hadoop.
 
 ## 17. Shared-Nothing Architecture
-
-Each node is **fully independent** with its own CPU, memory, and disk. No shared state — perfect for horizontal scaling.
-
-```
-+--------------+  +--------------+  +--------------+
-|   Node 1     |  |   Node 2     |  |   Node 3     |
-| CPU+RAM+DB   |  | CPU+RAM+DB   |  | CPU+RAM+DB   |
-+--------------+  +--------------+  +--------------+
-        No shared resources between nodes
-```
-
-**Examples:** Cassandra, CockroachDB, Google Spanner
-
----
+Every node has its own CPU, memory, and storage. Nothing is shared between nodes. Makes horizontal scaling very easy. Used by Cassandra and CockroachDB.
 
 ## 18. Lambda Architecture (Big Data)
-
-Handles massive data with **two parallel paths**: Batch layer (historical) + Speed layer (real-time), merged at Serving layer.
-
-```
-              +-------------------+
-Data -------->|   BATCH LAYER     |---> Batch Views
-Stream        +-------------------+          |
-  |                                          v
-  |          +-------------------+    +----------+
-  +--------->|   SPEED LAYER     |--->| SERVING  |--> Query
-             +-------------------+    |  LAYER   |
-             Real-time Views          +----------+
-```
-
-**When to use:** Analytics platforms, large-scale ETL, Hadoop + Storm pipelines.
-
----
+Handles big data with two paths running in parallel — a batch layer for historical data and a speed layer for real-time data. Both are merged in a serving layer.
 
 ## 19. Kappa Architecture (Big Data)
-
-Simplified Lambda — **removes the batch layer**. All processing through a single streaming pipeline. Historical data reprocessed by replaying the stream.
-
-```
-Data Stream --> [Stream Processing] --> Serving Layer --> Query
-                    (Kafka+Flink)
-                         |
-                 Replayable Log
-               (replay = recompute)
-```
-
-**When to use:** When Lambda is too complex; stream-first systems.
-
----
+A simpler version of Lambda. Only one streaming pipeline handles everything. You reprocess old data by replaying the stream. Uses Kafka and Flink.
 
 ## 20. Data Mesh Architecture
-
-Treats **data as a product** with domain teams owning their own data pipelines. Decentralized data ownership following microservices principles.
-
-```
-+----------------------------------------+
-|         DOMAIN-ORIENTED DATA           |
-|                                        |
-| +------------+ +------------+ +------+ |
-| |   Team A   | |   Team B   | |Team C| |
-| |(Owns data) | |(Owns data) | |(Own) | |
-| +-----+------+ +-----+------+ +--+---+ |
-|       |              |           |     |
-|       +--------------+-----------+     |
-|                      |                 |
-|          +-----------v----------+      |
-|          | Self-Serve Platform  |      |
-|          +---------------------+      |
-+----------------------------------------+
-```
-
-**When to use:** Large orgs with multiple data domains and autonomous teams.
-
----
+Each team owns and manages their own data like a product. Data ownership is decentralized, following the same idea as microservices but applied to data.
 
 ## 21. Microfrontend Architecture
-
-Applies microservices thinking to the **frontend**. Each team owns a vertical slice including UI — independently deployable.
-
-```
-+--------------------------------------+
-|         SHELL / CONTAINER            |
-| +---------+ +---------+ +---------+ |
-| | Team A  | | Team B  | | Team C  | |
-| | (Cart)  | |(Product)| | (Auth)  | |
-| | React   | |  Vue    | | Svelte  | |
-| +---------+ +---------+ +---------+ |
-+--------------------------------------+
-```
-
-**When to use:** Large frontend teams needing independent deployment and tech flexibility.
-
----
+Applies microservices thinking to the frontend. Each team builds and deploys their own piece of the UI independently. Different teams can use different frameworks.
 
 ## 22. JAMstack Architecture
-
-**JavaScript + APIs + Markup.** Pre-rendered static sites served from CDN with dynamic features via JavaScript and APIs.
-
-```
-Build Time:
-Content --> SSG --> HTML/JS/CSS --> CDN
-
-Runtime:
-Browser --> CDN (static)
-Browser --> API (dynamic)
-```
-
-**Tools:** Next.js, Gatsby, Netlify, Vercel
-
-**When to use:** Marketing sites, blogs, docs, e-commerce storefronts.
-
----
+JavaScript + APIs + Markup. Pages are pre-built at build time and served from a CDN. Dynamic features are handled by JavaScript and external APIs at runtime.
 
 ## 23. BFF — Backend for Frontend
-
-**Dedicated backend per frontend type** (mobile, web, TV). Each BFF is optimized for its specific client's needs.
-
-```
-              +-------------+
-Mobile App -->|  Mobile BFF |
-              +------+------+
-                     |
-Web App -------->+---v-------+    +-----------+
-                 |  Web BFF  |--> |  Backend  |
-                 +------+----+    |  Services |
-                     |            +-----------+
-Smart TV ------->+---v------+
-                 |  TV BFF  |
-                 +----------+
-```
-
-**When to use:** Multiple client types with different data shapes and performance requirements.
-
----
+A separate backend is built for each type of client (mobile, web, TV). Each BFF returns exactly the data that client needs, nothing more.
 
 ## 24. SAGA Pattern Architecture
-
-Manages **distributed transactions** across microservices without 2PC. Sequence of local transactions with compensating transactions for rollback.
-
-```
-Choreography (event-based):
-OrderSvc--event-->PaySvc--event-->StockSvc--event-->ShipSvc
-
-Orchestration (central coordinator):
-     +-------------------+
-     | Saga Orchestrator |
-     +--+------+------+--+
-      cmd     cmd    cmd
-     +---+  +----+  +-----+
-     |Pay|  |Stck|  |Ship |
-     +---+  +----+  +-----+
-```
-
-**When to use:** Distributed transactions, multi-service workflows, e-commerce order flows.
-
----
+Manages transactions that span multiple microservices. Instead of one big transaction, it runs a chain of small ones. If something fails, compensating actions undo the previous steps.
 
 ## 25. Strangler Fig Architecture
-
-**Migration pattern** to incrementally replace a legacy monolith with microservices. New functionality goes into microservices; old code is strangled over time.
-
-```
-Phase 1:  Client --> Monolith (all traffic)
-
-Phase 2:  Client --> Facade --> Monolith (most)
-                            +-> New Service (some)
-
-Phase 3:  Client --> Facade --> New Services (all)
-```
-
-**When to use:** Legacy modernization without big-bang rewrites.
-
----
+A migration pattern. You slowly replace parts of a legacy system with new services. Traffic is gradually shifted until the old system is completely replaced.
 
 ## 26. Cell-Based Architecture
-
-System divided into **isolated cells**, each a complete mini-stack (app + DB + cache). Traffic is routed to cells. Failure is contained within a cell.
-
-```
-          Load Balancer / Router
-         /          |           \
-   +---------+  +---------+  +---------+
-   | Cell 1  |  | Cell 2  |  | Cell 3  |
-   | App+DB  |  | App+DB  |  | App+DB  |
-   +---------+  +---------+  +---------+
-   User 1-1000  1001-2000     2001-3000
-```
-
-**When to use:** High-availability systems, multi-tenant SaaS, blast-radius containment.
-
----
+The system is split into isolated cells, each with its own app, database, and cache. If one cell fails, the others keep running. Used for high availability.
 
 ## 27. Edge Computing Architecture
-
-Processing happens **closer to the user** at network edge (CDN nodes, edge servers) rather than a central data center.
-
-```
-User --> Edge Node (nearby) --> Central Cloud (if needed)
-         (compute + cache)
-```
-
-**Tools:** Cloudflare Workers, AWS Lambda@Edge
-
-**When to use:** IoT devices, low-latency requirements, global content delivery.
-
----
+Processing happens close to the user at edge nodes (like CDN servers) instead of in a central data center. Reduces latency. Used for IoT and real-time apps.
 
 ## 28. Reactive Architecture
-
-Based on the **Reactive Manifesto**: systems are Responsive, Resilient, Elastic, and Message-Driven.
-
-| Principle | Meaning |
-|---|---|
-| Responsive | Always responds in time |
-| Resilient | Stays responsive under failure |
-| Elastic | Scales under varying load |
-| Message-Driven | Async message passing |
-
-**Tools:** Akka, RxJava, Project Reactor, Vert.x
-
-**When to use:** High-availability systems, financial platforms, streaming applications.
-
----
+Based on the Reactive Manifesto. Systems are built to be Responsive, Resilient, Elastic, and Message-Driven. Built for high availability and async communication.
 
 ## 29. Actor Model Architecture
-
-**Actor** is the fundamental unit of computation. Each actor has its own state, processes messages asynchronously, and can create other actors.
-
-```
- +--------+  msg  +--------+  msg  +--------+
- | Actor  |------>| Actor  |------>| Actor  |
- |   (A)  |       |   (B)  |       |   (C)  |
- +--------+       +--------+       +--------+
- State:{x}        State:{y}        State:{z}
-```
-
-**Examples:** Erlang/OTP (WhatsApp), Akka, Microsoft Orleans
-
-**When to use:** Highly concurrent systems, game servers, real-time simulations.
-
----
+The actor is the basic unit. Each actor has its own private state and communicates only through messages. No shared state means no race conditions. Used in Erlang and Akka.
 
 ## 30. Plugin / Extension Architecture
-
-Core system with a **plugin API** allowing third parties to extend functionality without modifying the core.
-
-```
-+----------------------------------+
-|            CORE SYSTEM           |
-|  +----------------------------+  |
-|  |      Plugin Registry       |  |
-|  +----------------------------+  |
-+----------------------------------+
-         |
-  +------+--------+
-  | Plugin A | Plugin B |
-  +----------+----------+
-```
-
-**Examples:** VS Code, WordPress, Eclipse, Jenkins
-
-**When to use:** Platforms, IDEs, CMSs, developer tools, marketplaces.
-
----
+A core system exposes an API for plugins. Third parties extend the system without touching the core code. Examples: VS Code, WordPress, Jenkins.
 
 ## 31. API Gateway Architecture
-
-**Single entry point** for all client requests. Handles routing, auth, rate limiting, SSL termination, monitoring, and caching.
-
-```
-       +-----------------------------------------+
-Client |              API GATEWAY                |
-  +--->| Auth | RateLimit | Logging | SSL | Cache |
-       +----+-----+------+----------+----+--------+
-            |     |      |          |
-         +--v-+ +-v--+ +-v--+    +-v--+
-         |SvcA| |SvcB| |SvcC|    |SvcD|
-         +----+ +----+ +----+    +----+
-```
-
-**When to use:** Microservices, API management, multi-client systems.
-
----
+One entry point for all client requests. The gateway handles authentication, rate limiting, logging, SSL, and routing to the right backend service.
 
 ## 32. Service Mesh Architecture
-
-**Infrastructure layer** for service-to-service communication. Each service gets a sidecar proxy handling traffic, security, and observability.
-
-```
-+-------------------+  +-------------------+
-|  Service A        |  |  Service B        |
-|  +-------------+  |  |  +-------------+  |
-|  | App Code    |  |  |  | App Code    |  |
-|  +-------------+  |  |  +-------------+  |
-|  +-------------+  |  |  +-------------+  |
-|  |Sidecar Proxy|<-+--+->|Sidecar Proxy|  |
-|  +-------------+  |  |  +-------------+  |
-+-------------------+  +-------------------+
-          ^                    ^
-          +---- Control Plane -+
-               (Istio/Linkerd)
-```
-
-**When to use:** Large microservice clusters, Kubernetes environments, zero-trust security.
+A dedicated infrastructure layer manages all communication between services. Each service gets a sidecar proxy that handles traffic, security, and observability. Examples: Istio, Linkerd.
 
 ---
 
-## Architecture Decision Map
+## When to Use What
 
-### By Team Scale
+**By team size:**
+- 1 to 5 developers — Monolithic or Layered
+- 5 to 20 developers — SOA or Modular Monolith
+- 20 to 100 developers — Microservices, EDA, DDD
+- 100+ developers — Cell-Based, Data Mesh
 
-| Team Size | Recommended Architecture |
-|---|---|
-| Small (1–5 devs) | Monolithic, Layered, Clean Architecture |
-| Medium (5–20 devs) | Modular Monolith, SOA |
-| Large (20–100 devs) | Microservices, EDA, DDD |
-| Massive (100+ devs) | Cell-Based, Data Mesh |
+**By domain:**
+- E-Commerce — Microservices, SAGA, BFF
+- Analytics — Lambda, Kappa, Data Mesh
+- Real-time / IoT — EDA, Edge, Reactive
+- Finance / Banking — CQRS, DDD, SOA
 
-### By Domain
-
-| Domain | Recommended Architecture |
-|---|---|
-| E-Commerce | Microservices, SAGA, BFF |
-| Analytics / BI | Lambda, Kappa, Data Mesh |
-| Real-time / IoT | EDA, Edge, Reactive, Actor Model |
-| Financial / Banking | CQRS, DDD, SOA |
-
-### By Key Concern
-
-| Concern | Architecture |
-|---|---|
-| Fault Tolerance | Cell-Based, Reactive |
-| Auditability | Event Sourcing, CQRS |
-| Scalability | Serverless, Space-Based, Shared-Nothing |
-| Team Autonomy | Microservices, Microfrontend |
-
-### AI Generation Hints
-
-| User says... | Suggest... |
-|---|---|
-| startup, fast MVP | Monolithic |
-| many teams, independent deploys | Microservices |
-| real-time, events, notifications | EDA, Reactive |
-| audit, history, undo | CQRS + Event Sourcing |
-| massive data, analytics | Lambda / Kappa / Data Mesh |
-| IoT, edge, low latency | Edge Computing |
-| plugin system, marketplace | Plugin Architecture |
-| migrate legacy | Strangler Fig |
-| mobile + web + TV | BFF |
-| blockchain, decentralized | P2P |
-
----
-
-*ArchTemplat v1.0 — 32 Architectures Reference*
+**By concern:**
+- Need fault tolerance — Cell-Based, Reactive
+- Need full audit history — Event Sourcing, CQRS
+- Need to scale fast — Serverless, Shared-Nothing
+- Need team independence — Microservices, Microfrontend
+- Migrating a legacy system — Strangler Fig
